@@ -41,7 +41,7 @@ export const App = () => {
           setMessage(true);
           return;
         }
-        setItems([...items, ...data.hits]);
+        setItems(items => [...items, ...data.hits]);
         setError(null);
         setMessage(false);
       } catch (error) {
@@ -51,7 +51,7 @@ export const App = () => {
       }
     };
     fetchPhoto();
-  }, [search, page, per_page]);
+  }, [search, page]);
 
   const loadMore = () => setPage(page + 1);
 
