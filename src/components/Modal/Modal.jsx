@@ -13,12 +13,15 @@ const Modal = ({ close, children }) => {
       close();
     }
   };
+
   useEffect(() => {
     document.addEventListener('keydown', closeModal);
+    console.log('add');
     return () => {
       document.removeEventListener('keydown', closeModal);
+      console.log('delete');
     };
-  }, []);
+  });
 
   return createPortal(
     <Overlay onClick={closeModal}>
