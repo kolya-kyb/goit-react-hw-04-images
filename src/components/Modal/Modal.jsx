@@ -16,10 +16,8 @@ const Modal = ({ close, children }) => {
 
   useEffect(() => {
     document.addEventListener('keydown', closeModal);
-    console.log('add');
     return () => {
       document.removeEventListener('keydown', closeModal);
-      console.log('delete');
     };
   });
 

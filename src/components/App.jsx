@@ -11,19 +11,24 @@ import { searchPhoto } from '../shared/api/Api';
 
 import { Finder, Img } from './App.styled';
 
+const per_page = 12;
+
 export const App = () => {
   const [search, setSearch] = useState('');
-  const [items, setItems] = useState('');
+  const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
   const [totalPage, setTotalPage] = useState(null);
-  const [per_page, setPer_Page] = useState(12);
+
   const [largeImg, setLargeImg] = useState('');
   const [message, setMessage] = useState(false);
   const [showModal, setshowModal] = useState(false);
 
   useEffect(() => {
+    if (!search) {
+      return;
+    }
     const fetchPhoto = async () => {
       try {
         setLoading(true);
@@ -46,7 +51,7 @@ export const App = () => {
       }
     };
     fetchPhoto();
-  }, [search, page]);
+  }, [search, page, per_page]);
 
   const loadMore = () => setPage(page + 1);
 
