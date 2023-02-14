@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useEffect, useState } from 'react';
 
 import SearchForm from './Searchbar/Searchbar';
 import ImageGallery from './ImageGallery/ImageGallery';
@@ -7,10 +7,93 @@ import Loader from './Loader/Loader';
 import Modal from './Modal/Modal';
 import ImageGalleryItem from './ImageGalleryItem/ImageGalleryItem';
 
-import { searchPhoto } from './shared/api/Api';
+import { searchPhoto } from '../shared/api/Api';
 
 import { Finder, Img } from './App.styled';
 
+export const App = () => {
+  const [search, setSearch] = useState('');
+  const [items, setItems] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [totalPage, setTotalPage] = useState(null);
+  const [per_page, setPer_Page] = useState(12);
+  const [largeImg, setLargeImg] = useState('');
+  const [message, setMessage] = useState(false);
+  const [showModal, setshowModal] = useState(false);
+
+  useEffect(() => {
+    const fetchPhoto = async () => {
+      try {
+        setLoading(true);
+
+        const data = await searchPhoto(search, page, per_page);
+
+        setTotalPage(Math.ceil(data.totalHits / per_page));
+
+        if (data.hits.length === 0) {
+          setMessage(true);
+          return;
+        }
+        setItems([...items, ...data.hits]);
+        setError(null);
+        setMessage(false);
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPhoto();
+  }, [search, page]);
+
+  const loadMore = () => setPage(page + 1);
+
+  const searchPhotos = searchObj => {
+    const { search: searchWord } = searchObj;
+    if (searchWord === search) {
+      return;
+    }
+    setSearch(searchWord);
+    setPage(1);
+    setTotalPage(null);
+    setItems([]);
+  };
+
+  const closeModal = () => setshowModal(false);
+
+  const handleClickImg = largeImg => {
+    setshowModal(true);
+    setLargeImg(largeImg);
+  };
+
+  return (
+    <Finder>
+      <SearchForm onSubmit={searchPhotos} />
+      {loading && <Loader />}
+      {error && <span>{error}</span>}
+      {message && <span>Нічого не знайдено</span>}
+      {Boolean(items.length) && (
+        <ImageGallery>
+          <ImageGalleryItem items={items} handleClick={handleClickImg} />
+        </ImageGallery>
+      )}
+
+      {page < totalPage && (
+        <Button handleClick={loadMore}>
+          <span>Load more</span>
+        </Button>
+      )}
+      {showModal && (
+        <Modal close={closeModal}>
+          <Img src={largeImg} alt="" />
+        </Modal>
+      )}
+    </Finder>
+  );
+};
+/*
 export class App extends Component {
   state = {
     search: '',
@@ -121,3 +204,4 @@ export class App extends Component {
     );
   }
 }
+*/
